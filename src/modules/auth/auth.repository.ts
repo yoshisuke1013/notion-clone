@@ -8,7 +8,8 @@ export const authRepository = {
       options: { data: { name } },
     });
 
-    if (error != null || data == null) throw new Error(error?.message);
+    if (error != null || data == null || data.user == null)
+      throw new Error(error?.message);
 
     return {
       ...data.user,
@@ -22,11 +23,23 @@ export const authRepository = {
       password,
     });
 
-    if (error != null || data == null) throw new Error(error?.message);
+    if (error != null || data == null || data.user == null)
+      throw new Error(error?.message);
 
     return {
       ...data.user,
       userName: data.user?.user_metadata.name,
+    };
+  },
+
+  async getCurrentUser() {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error != null || data == null || data.session == null) return;
+
+    return {
+      ...data.session.user,
+      userName: data.session.user.user_metadata.name,
     };
   },
 };
