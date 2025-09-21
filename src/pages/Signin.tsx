@@ -1,6 +1,21 @@
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { authRepository } from "../modules/auth/auth.repository";
 
 function Signin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const signin = async () => {
+    try {
+      if (email == "" || password == "") return;
+      const user = await authRepository.signin(email, password);
+      console.log(user);
+    } catch (error) {
+      console.error("ログインに失敗しました", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center">
@@ -25,6 +40,10 @@ function Signin() {
                     required
                     type="email"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring--500 focus:border--500 sm:text-sm"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
                   />
                 </div>
               </div>
@@ -43,17 +62,25 @@ function Signin() {
                     required
                     type="password"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring--500 focus:border--500 sm:text-sm"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
                   />
                 </div>
               </div>
               <div>
-                <button className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring--500 disabled:opacity-50 disabled:cursor-not-allowed">
+                <button
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring--500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={email == "" || password == ""}
+                  onClick={signin}
+                >
                   ログイン
                 </button>
               </div>
               <div className="mt-4 text-center text-sm">
                 登録は
-                <Link className="underline" to={'/signup'}>
+                <Link className="underline" to={"/signup"}>
                   こちら
                 </Link>
                 から
