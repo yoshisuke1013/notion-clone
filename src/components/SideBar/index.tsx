@@ -1,14 +1,29 @@
-import { FC } from 'react';
-import { Item } from './Item';
-import { NoteList } from '../NoteList';
-import UserItem from './UserItem';
-import { Plus, Search } from 'lucide-react';
+import { FC } from "react";
+import { useCurrentUserStore } from "../../modules/auth/current-user.state";
+import { useNoteStore } from "../../modules/notes/note.state";
+import { noteRepository } from "@/modules/notes/note.repository";
+import { Item } from "./Item";
+import { NoteList } from "../NoteList";
+import UserItem from "./UserItem";
+import { Plus, Search } from "lucide-react";
 
 type Props = {
   onSearchButtonClicked: () => void;
 };
 
 const SideBar: FC<Props> = ({ onSearchButtonClicked }) => {
+  const { currentUser } = useCurrentUserStore();
+  const noteStore = useNoteStore();
+
+  const createNote = async () => {
+    try {
+      const newNote = await noteRepository.create(currentUser!.id, {});
+      noteStore.set([newNote]);
+    } catch (error) {
+      console.error("ノートの作成に失敗しました", error);
+    }
+  };
+
   return (
     <>
       <aside className="group/sidebar h-full bg-neutral-100 overflow-y-auto relative flex flex-col w-60">
@@ -16,12 +31,12 @@ const SideBar: FC<Props> = ({ onSearchButtonClicked }) => {
           <div>
             <UserItem
               user={{
-                id: 'test',
-                aud: 'test',
-                email: 'test@gmail.com',
-                user_metadata: { name: 'testさん' },
+                id: "test",
+                aud: "test",
+                email: "test@gmail.com",
+                user_metadata: { name: "testさん" },
                 app_metadata: {},
-                created_at: 'test',
+                created_at: "test",
               }}
               signout={() => {}}
             />
@@ -29,7 +44,7 @@ const SideBar: FC<Props> = ({ onSearchButtonClicked }) => {
           </div>
           <div className="mt-4">
             <NoteList />
-            <Item label="ノートを作成" icon={Plus} />
+            <Item label="ノートを作成" icon={Plus} onClick={createNote} />
           </div>
         </div>
       </aside>
