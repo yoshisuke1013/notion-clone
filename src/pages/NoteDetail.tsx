@@ -4,6 +4,7 @@ import { useCurrentUserStore } from "@/modules/auth/current-user.state";
 import { useNoteStore } from "@/modules/notes/note.state";
 import { noteRepository } from "@/modules/notes/note.repository";
 import { TitleInput } from "@/components/Toolbar";
+import Editor from "@/components/Editor";
 
 const NoteDetail = () => {
   const params = useParams();
@@ -31,15 +32,12 @@ const NoteDetail = () => {
     targetNote: { title?: string; content?: string }
   ) => {
     try {
-      setIsLoading(true);
       const updatedNote = await noteRepository.update(id, targetNote);
       if (updatedNote == null) return;
       noteStore.set([updatedNote]);
       return updatedNote;
     } catch (error) {
-      console.error("ノートの取得に失敗しました", error);
-    } finally {
-      setIsLoading(false);
+      console.error("ノートの更新に失敗しました", error);
     }
   };
 
@@ -56,6 +54,10 @@ const NoteDetail = () => {
         <TitleInput
           initialData={note}
           onTitleChange={(title) => updateNote(id, { title })}
+        />
+        <Editor
+          initialContent={note.content}
+          onChange={(content) => updateNote(id, { content })}
         />
       </div>
     </div>
