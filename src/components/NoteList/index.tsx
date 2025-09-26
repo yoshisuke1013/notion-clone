@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Note } from "@/modules/notes/note.entity";
 import { useCurrentUserStore } from "../../modules/auth/current-user.state";
@@ -12,6 +13,7 @@ interface NoteListProps {
 }
 
 export function NoteList({ layer = 0, parentId }: NoteListProps) {
+  const navigate = useNavigate();
   const noteStore = useNoteStore();
   const notes = noteStore.getAll();
   const { currentUser } = useCurrentUserStore();
@@ -22,6 +24,7 @@ export function NoteList({ layer = 0, parentId }: NoteListProps) {
     const newNote = await noteRepository.create(currentUser!.id, { parentId });
     noteStore.set([newNote]);
     setExpanded((prev) => prev.set(parentId, true));
+    moveToDetail(newNote.id);
   };
 
   const fetchChildren = async (e: React.MouseEvent, note: Note) => {
@@ -34,6 +37,10 @@ export function NoteList({ layer = 0, parentId }: NoteListProps) {
       newExpanded.set(note.id, !prev.get(note.id));
       return newExpanded;
     });
+  };
+
+  const moveToDetail = (noteId: number) => {
+    navigate(`/notes/${noteId}`);
   };
 
   return (
@@ -58,6 +65,7 @@ export function NoteList({ layer = 0, parentId }: NoteListProps) {
                 expanded={expanded.get(note.id)}
                 onCreate={(e) => createChild(e, note.id)}
                 onExpand={(e) => fetchChildren(e, note)}
+                onClick={() => moveToDetail(note.id)}
               />
               {expanded.get(note.id) && (
                 <NoteList layer={layer + 1} parentId={note.id} />

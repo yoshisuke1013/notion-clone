@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCurrentUserStore } from "../modules/auth/current-user.state";
 import { useNoteStore } from "../modules/notes/note.state";
 import { noteRepository } from "@/modules/notes/note.repository";
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
 export function Home() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const { currentUser } = useCurrentUserStore();
   const noteStore = useNoteStore();
@@ -15,6 +17,7 @@ export function Home() {
       const newNote = await noteRepository.create(currentUser!.id, { title });
       setTitle("");
       noteStore.set([newNote]);
+      navigate(`/notes/${newNote.id}`);
     } catch (error) {
       console.error("ノートの作成に失敗しました", error);
     }

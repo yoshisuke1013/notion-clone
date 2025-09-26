@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCurrentUserStore } from "../../modules/auth/current-user.state";
 import { useNoteStore } from "../../modules/notes/note.state";
 import { noteRepository } from "@/modules/notes/note.repository";
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const SideBar: FC<Props> = ({ onSearchButtonClicked }) => {
+  const navigate = useNavigate();
   const { currentUser } = useCurrentUserStore();
   const noteStore = useNoteStore();
 
@@ -19,6 +21,7 @@ const SideBar: FC<Props> = ({ onSearchButtonClicked }) => {
     try {
       const newNote = await noteRepository.create(currentUser!.id, {});
       noteStore.set([newNote]);
+      navigate(`/notes/${newNote.id}`);
     } catch (error) {
       console.error("ノートの作成に失敗しました", error);
     }
