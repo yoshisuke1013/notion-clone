@@ -26,6 +26,23 @@ const NoteDetail = () => {
     }
   };
 
+  const updateNote = async (
+    id: number,
+    targetNote: { title?: string; content?: string }
+  ) => {
+    try {
+      setIsLoading(true);
+      const updatedNote = await noteRepository.update(id, targetNote);
+      if (updatedNote == null) return;
+      noteStore.set([updatedNote]);
+      return updatedNote;
+    } catch (error) {
+      console.error("ノートの取得に失敗しました", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchOne();
   }, [id]);
@@ -36,7 +53,10 @@ const NoteDetail = () => {
   return (
     <div className="pb-40 pt-20">
       <div className="md:max-w-3xl lg:md-max-w-4xl mx-auto">
-        <TitleInput initialData={note} />
+        <TitleInput
+          initialData={note}
+          onTitleChange={(title) => updateNote(id, { title })}
+        />
       </div>
     </div>
   );
